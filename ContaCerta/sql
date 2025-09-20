@@ -1,0 +1,84 @@
+-- Criar o banco de dados
+CREATE DATABASE IF NOT EXISTS financeiro_db;
+USE financeiro_db;
+
+-- Tabela de Clientes
+CREATE TABLE clientes (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    telefone VARCHAR(20) NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Tabela de Produtos
+CREATE TABLE produtos (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255) NOT NULL,
+    preco DECIMAL(10,2) NOT NULL CHECK (preco > 0),
+    quantidade_estoque INT NOT NULL CHECK (quantidade_estoque >= 0),
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Tabela de Movimentações
+CREATE TABLE movimentacoes (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tipo ENUM('ENTRADA', 'SAIDA') NOT NULL,
+    valor DECIMAL(10,2) NOT NULL CHECK (valor > 0),
+    descricao TEXT,
+    cliente_id BIGINT,
+    produto_id BIGINT,
+    data_movimentacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL,
+    FOREIGN KEY (produto_id) REFERENCES produtos(id) ON DELETE SET NULL
+);
+
+-- Índices para melhor performance
+CREATE INDEX idx_movimentacoes_tipo ON movimentacoes(tipo);
+CREATE INDEX idx_movimentacoes_cliente ON movimentacoes(cliente_id);
+CREATE INDEX idx_movimentacoes_produto ON movimentacoes(produto_id);
+CREATE INDEX idx_movimentacoes_data ON movimentacoes(data_movimentacao);
+CREATE INDEX idx_clientes_email ON clientes(email);
+CREATE INDEX idx_produtos_nome ON produtos(nome);
+
+-- Dados de exemplo
+INSERT INTO clientes (nome, email, telefone) VALUES
+('João Silva', 'joao.silva@email.com', '(11) 99999-9999'),
+('Maria Santos', 'maria.santos@email.com', '(11) 98888-8888'),
+('Pedro Oliveira', 'pedro.oliveira@email.com', '(11) 97777-7777');
+
+INSERT INTO produtos (nome, preco, quantidade_estoque) VALUES
+('Notebook Dell', 2500.00, 10),
+('Mouse Wireless', 89.90, 50),
+('Teclado Mecânico', 299.90, 25),
+('Monitor 24"', 899.90, 15);
+
+INSERT INTO movimentacoes (tipo, valor, descricao, cliente_id, produto_id) VALUES
+('ENTRADA', 2500.00, 'Venda de Notebook Dell', 1, 1),
+('ENTRADA', 179.80, 'Venda de 2 Mouses Wireless', 2, 2),
+('SAIDA', 299.90, 'Compra de Teclado Mecânico', 3, 3),
+('ENTRADA', 899.90, 'Venda de Monitor 24"', 1, 4),
+('SAIDA', 89.90, 'Compra de Mouse Wireless', 2, 2);
+
+-- Views úteis
+CREATE VIEW view_saldo_atual AS
+SELECT
+    (SELECT COALESCE(SUM(valor), 0) FROM movimentacoes WHERE tipo = 'ENTRADA') -
+    (SELECT COALESCE(SUM(valor), 0) FROM movimentacoes WHERE tipo = 'SAIDA') AS saldo;
+
+CREATE VIEW view_movimentacoes_completas AS
+SELECT
+    m.id,
+    m.tipo,
+    m.valor,
+    m.descricao,
+    m.data_movimentacao,
+    c.nome AS cliente_nome,
+    p.nome AS produto_nome
+FROM movimentacoes m
+LEFT JOIN clientes c ON m.cliente_id = c.id
+LEFT JOIN produtos p ON m.produto_id = p.id
+ORDER BY m.data_movimentacao DESC;
