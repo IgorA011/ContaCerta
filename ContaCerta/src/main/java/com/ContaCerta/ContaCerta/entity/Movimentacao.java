@@ -1,6 +1,6 @@
 package com.ContaCerta.ContaCerta.entity;
 
-import com.contacerta.entity.TipoMovimentacao;
+import com.ContaCerta.ContaCerta.entity.TipoMovimentacao;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
