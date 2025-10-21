@@ -11,14 +11,12 @@
     <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-    <!-- Tela de Login -->
-    <div id="login-page" class="login-container">
+<!-- Tela de Login -->
+<div id="login-page" class="login-container">
     <div class="login-card">
         <div class="login-header text-center">
             <!-- Logo -->
-           <img src="/img/igor.png" alt="Logo Conta Certa" class="mb-2" style="max-width: 10000px;">
-
-        
+            <img src="/img/igor.png" alt="Logo Conta Certa" class="mb-2" style="max-width: 10000px;">
         </div>
         <div class="login-body">
             <form id="login-form">
@@ -48,488 +46,495 @@
     </div>
 </div>
 
-    <!-- Sistema Principal (inicialmente oculto) -->
-    <div id="app" class="hidden">
-        <!-- Barra de Navegação Superior -->
-        <nav class="navbar navbar-expand-lg navbar-light">
-            <div class="container-fluid">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#"><i class="bi bi-house-door"></i> Bem-vindo</a>
-                        </li>
-                    </ul>
-                    <div class="d-flex align-items-center">
-                        <span class="me-3" id="user-info">Usuário: <strong id="current-user"></strong> (<span id="user-role"></span>)</span>
-                        <button class="btn btn-outline-secondary btn-sm" id="logout-btn">
-                            <i class="bi bi-box-arrow-right"></i> Sair
-                        </button>
+<!-- Sistema Principal (inicialmente oculto) -->
+<div id="app" class="hidden">
+    <!-- Barra de Navegação Superior -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="bi bi-house-door"></i> Bem-vindo</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span class="me-3" id="user-info">Usuário: <strong id="current-user"></strong> (<span id="user-role"></span>)</span>
+                    <button class="btn btn-outline-secondary btn-sm" id="logout-btn">
+                        <i class="bi bi-box-arrow-right"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="#dashboard">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item admin-only">
+                <a class="nav-link" href="#clientes">
+                    <i class="bi bi-people-fill"></i> Clientes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#consultar-clientes">
+                    <i class="bi bi-search"></i> Consultar Clientes
+                </a>
+            </li>
+            <li class="nav-item admin-only">
+                <a class="nav-link" href="#produtos">
+                    <i class="bi bi-box-seam"></i> Produtos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#consultar-produtos">
+                    <i class="bi bi-search"></i> Consultar Produtos
+                </a>
+            </li>
+            <li class="nav-item admin-only">
+                <a class="nav-link" href="#movimentacoes">
+                    <i class="bi bi-arrow-left-right"></i> Movimentações
+                </a>
+            </li>
+            <li class="nav-item admin-only">
+                <a class="nav-link" href="#relatorios">
+                    <i class="bi bi-graph-up"></i> Relatórios
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <!-- Dashboard -->
+        <div id="dashboard-content" class="content-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Dashboard</h2>
+                <div id="saldo-atual" class="fs-4 fw-bold admin-only">Saldo: R$ 0,00</div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Total de Clientes</h5>
+                            <h2 id="total-clientes">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Total de Produtos</h5>
+                            <h2 id="total-produtos">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Movimentações Hoje</h5>
+                            <h2 id="movimentacoes-hoje">0</h2>
+                        </div>
                     </div>
                 </div>
             </div>
-        </nav>
 
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#dashboard">
-                        <i class="bi bi-speedometer2"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item admin-only">
-                    <a class="nav-link" href="#clientes">
-                        <i class="bi bi-people-fill"></i> Clientes
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#consultar-clientes">
-                        <i class="bi bi-search"></i> Consultar Clientes
-                    </a>
-                </li>
-                <li class="nav-item admin-only">
-                    <a class="nav-link" href="#produtos">
-                        <i class="bi bi-box-seam"></i> Produtos
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#consultar-produtos">
-                        <i class="bi bi-search"></i> Consultar Produtos
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#movimentacoes">
-                        <i class="bi bi-arrow-left-right"></i> Movimentações
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#relatorios">
-                        <i class="bi bi-graph-up"></i> Relatórios
-                    </a>
-                </li>
-            </ul>
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Últimas Movimentações</span>
+                    <a href="#movimentacoes" class="btn btn-sm btn-primary admin-only">Ver Todas</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Descrição</th>
+                            </tr>
+                            </thead>
+                            <tbody id="ultimas-movimentacoes">
+                            <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Conteúdo Principal -->
-        <div class="main-content">
-            <!-- Dashboard -->
-            <div id="dashboard-content" class="content-section">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Dashboard</h2>
-                    <div id="saldo-atual" class="fs-4 fw-bold">Saldo: R$ 0,00</div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">Total de Clientes</h5>
-                                <h2 id="total-clientes">0</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">Total de Produtos</h5>
-                                <h2 id="total-produtos">0</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">Movimentações Hoje</h5>
-                                <h2 id="movimentacoes-hoje">0</h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card mt-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Últimas Movimentações</span>
-                        <a href="#movimentacoes" class="btn btn-sm btn-primary">Ver Todas</a>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Data/Hora</th>
-                                        <th>Tipo</th>
-                                        <th>Valor</th>
-                                        <th>Descrição</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ultimas-movimentacoes">
-                                    <!-- Preenchido via JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Cadastro de Clientes (Admin) -->
+        <div id="clientes-content" class="content-section hidden">
+            <h2 class="mb-4">Cadastro de Clientes</h2>
 
-            <!-- Cadastro de Clientes (Admin) -->
-            <div id="clientes-content" class="content-section hidden">
-                <h2 class="mb-4">Cadastro de Clientes</h2>
-                
-                <div class="card">
-                    <div class="card-header">Novo Cliente</div>
-                    <div class="card-body">
-                        <form id="cliente-form">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="cliente-nome" class="form-label">Nome</label>
-                                    <input type="text" class="form-control" id="cliente-nome" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="cliente-email" class="form-label">E-mail</label>
-                                    <input type="email" class="form-control" id="cliente-email" required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="cliente-telefone" class="form-label">Telefone</label>
-                                    <input type="text" class="form-control" id="cliente-telefone" required>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Salvar Cliente</button>
-                        </form>
-                    </div>
-                </div>
-                
-                <div class="card mt-4">
-                    <div class="card-header">Clientes Cadastrados</div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>E-mail</th>
-                                        <th>Telefone</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="clientes-list">
-                                    <!-- Preenchido via JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Consulta de Clientes -->
-            <div id="consultar-clientes-content" class="content-section hidden">
-                <h2 class="mb-4">Consultar Clientes</h2>
-                
-                <div class="card mb-4">
-                    <div class="card-body">
+            <div class="card">
+                <div class="card-header">Novo Cliente</div>
+                <div class="card-body">
+                    <form id="cliente-form">
                         <div class="row">
-                            <div class="col-md-8">
-                                <input type="text" class="form-control" id="cliente-search" placeholder="Digite o nome, e-mail ou telefone do cliente...">
+                            <div class="col-md-6 mb-3">
+                                <label for="cliente-nome" class="form-label">Nome</label>
+                                <input type="text" class="form-control" id="cliente-nome" required>
                             </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-primary w-100" id="search-cliente-btn">
-                                    <i class="bi bi-search"></i> Pesquisar
-                                </button>
+                            <div class="col-md-6 mb-3">
+                                <label for="cliente-email" class="form-label">E-mail</label>
+                                <input type="email" class="form-control" id="cliente-email" required>
                             </div>
                         </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">Resultados da Pesquisa</div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>E-mail</th>
-                                        <th>Telefone</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="clientes-search-results">
-                                    <!-- Preenchido via JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cadastro de Produtos (Admin) -->
-            <div id="produtos-content" class="content-section hidden">
-                <h2 class="mb-4">Cadastro de Produtos</h2>
-                
-                <div class="card">
-                    <div class="card-header">Novo Produto</div>
-                    <div class="card-body">
-                        <form id="produto-form">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="produto-nome" class="form-label">Nome</label>
-                                    <input type="text" class="form-control" id="produto-nome" required>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label for="produto-preco" class="form-label">Preço (R$)</label>
-                                    <input type="number" step="0.01" class="form-control" id="produto-preco" required>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label for="produto-estoque" class="form-label">Estoque</label>
-                                    <input type="number" class="form-control" id="produto-estoque" required>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Salvar Produto</button>
-                        </form>
-                    </div>
-                </div>
-                
-                <div class="card mt-4">
-                    <div class="card-header">Produtos Cadastrados</div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Preço</th>
-                                        <th>Estoque</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="produtos-list">
-                                    <!-- Preenchido via JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Consulta de Produtos -->
-            <div id="consultar-produtos-content" class="content-section hidden">
-                <h2 class="mb-4">Consultar Produtos</h2>
-                
-                <div class="card mb-4">
-                    <div class="card-body">
                         <div class="row">
-                            <div class="col-md-8">
-                                <input type="text" class="form-control" id="produto-search" placeholder="Digite o nome do produto...">
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-primary w-100" id="search-produto-btn">
-                                    <i class="bi bi-search"></i> Pesquisar
-                                </button>
+                            <div class="col-md-6 mb-3">
+                                <label for="cliente-telefone" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" id="cliente-telefone" required>
                             </div>
                         </div>
+                        <button type="submit" class="btn btn-primary">Salvar Cliente</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">Clientes Cadastrados</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Telefone</th>
+                                <th>Ações</th>
+                            </tr>
+                            </thead>
+                            <tbody id="clientes-list">
+                            <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                
-                <div class="card">
-                    <div class="card-header">Resultados da Pesquisa</div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Preço</th>
-                                        <th>Estoque</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="produtos-search-results">
-                                    <!-- Preenchido via JavaScript -->
-                                </tbody>
-                            </table>
+            </div>
+        </div>
+
+        <!-- Consulta de Clientes -->
+        <div id="consultar-clientes-content" class="content-section hidden">
+            <h2 class="mb-4">Consultar Clientes</h2>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="cliente-search" placeholder="Digite o nome, e-mail ou telefone do cliente...">
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100" id="search-cliente-btn">
+                                <i class="bi bi-search"></i> Pesquisar
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Movimentações -->
-            <div id="movimentacoes-content" class="content-section hidden">
-                <h2 class="mb-4">Movimentações Financeiras</h2>
-                
-                <div class="card">
-                    <div class="card-header">Nova Movimentação</div>
-                    <div class="card-body">
-                        <form id="movimentacao-form">
-                            <div class="row">
-                                <div class="col-md-3 mb-3">
-                                    <label for="movimentacao-tipo" class="form-label">Tipo</label>
-                                    <select class="form-select" id="movimentacao-tipo" required>
-                                        <option value="">Selecione...</option>
-                                        <option value="ENTRADA">Entrada</option>
-                                        <option value="SAIDA">Saída</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label for="movimentacao-valor" class="form-label">Valor (R$)</label>
-                                    <input type="number" step="0.01" class="form-control" id="movimentacao-valor" required>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label for="movimentacao-cliente" class="form-label">Cliente</label>
-                                    <select class="form-select" id="movimentacao-cliente">
-                                        <option value="">Selecione um cliente (opcional)</option>
-                                        <!-- Preenchido via JavaScript -->
-                                    </select>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label for="movimentacao-produto" class="form-label">Produto</label>
-                                    <select class="form-select" id="movimentacao-produto">
-                                        <option value="">Selecione um produto (opcional)</option>
-                                        <!-- Preenchido via JavaScript -->
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label for="movimentacao-descricao" class="form-label">Descrição</label>
-                                    <textarea class="form-control" id="movimentacao-descricao" rows="2"></textarea>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Registrar Movimentação</button>
-                        </form>
+            <div class="card">
+                <div class="card-header">Resultados da Pesquisa</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Telefone</th>
+                            </tr>
+                            </thead>
+                            <tbody id="clientes-search-results">
+                            <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                
-                <div class="card mt-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Histórico de Movimentações</span>
-                        <button class="btn btn-sm export-btn" id="export-movimentacoes-btn">
-                            <i class="bi bi-download"></i> Exportar
-                        </button>
+            </div>
+        </div>
+
+        <!-- Cadastro de Produtos (Admin) -->
+        <div id="produtos-content" class="content-section hidden">
+            <h2 class="mb-4">Cadastro de Produtos</h2>
+
+            <div class="card">
+                <div class="card-header">Novo Produto</div>
+                <div class="card-body">
+                    <form id="produto-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="produto-nome" class="form-label">Nome</label>
+                                <input type="text" class="form-control" id="produto-nome" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="produto-preco" class="form-label">Preço (R$)</label>
+                                <input type="number" step="0.01" class="form-control" id="produto-preco" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="produto-estoque" class="form-label">Estoque</label>
+                                <input type="number" class="form-control" id="produto-estoque" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Produto</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">Produtos Cadastrados</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Preço</th>
+                                <th>Estoque</th>
+                                <th>Ações</th>
+                            </tr>
+                            </thead>
+                            <tbody id="produtos-list">
+                            <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Data/Hora</th>
-                                        <th>Tipo</th>
-                                        <th>Valor</th>
-                                        <th>Cliente</th>
-                                        <th>Produto</th>
-                                        <th>Descrição</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="movimentacoes-list">
-                                    <!-- Preenchido via JavaScript -->
-                                </tbody>
-                            </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consulta de Produtos -->
+        <div id="consultar-produtos-content" class="content-section hidden">
+            <h2 class="mb-4">Consultar Produtos</h2>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="produto-search" placeholder="Digite o nome do produto...">
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100" id="search-produto-btn">
+                                <i class="bi bi-search"></i> Pesquisar
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Relatórios -->
-            <div id="relatorios-content" class="content-section hidden">
-                <h2 class="mb-4">Relatórios</h2>
-                
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">Relatório de Clientes</h5>
-                                <p class="card-text">Lista completa de clientes cadastrados</p>
-                                <button class="btn export-btn" id="export-clientes-btn">
-                                    <i class="bi bi-download"></i> Exportar CSV
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">Relatório de Produtos</h5>
-                                <p class="card-text">Lista completa de produtos cadastrados</p>
-                                <button class="btn export-btn" id="export-produtos-btn">
-                                    <i class="bi bi-download"></i> Exportar CSV
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">Relatório Financeiro</h5>
-                                <p class="card-text">Todas as movimentações financeiras</p>
-                                <button class="btn export-btn" id="export-financeiro-btn">
-                                    <i class="bi bi-download"></i> Exportar CSV
-                                </button>
-                            </div>
-                        </div>
+            <div class="card">
+                <div class="card-header">Resultados da Pesquisa</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Preço</th>
+                                <th>Estoque</th>
+                            </tr>
+                            </thead>
+                            <tbody id="produtos-search-results">
+                            <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                
-                <div class="card">
-                    <div class="card-header">Filtros para Relatório de Movimentações</div>
-                    <div class="card-body">
-                        <form id="relatorio-form">
-                            <div class="row">
-                                <div class="col-md-3 mb-3">
-                                    <label for="data-inicio" class="form-label">Data Início</label>
-                                    <input type="date" class="form-control" id="data-inicio">
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label for="data-fim" class="form-label">Data Fim</label>
-                                    <input type="date" class="form-control" id="data-fim">
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label for="tipo-relatorio" class="form-label">Tipo</label>
-                                    <select class="form-select" id="tipo-relatorio">
-                                        <option value="">Todos</option>
-                                        <option value="ENTRADA">Entrada</option>
-                                        <option value="SAIDA">Saída</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 mb-3 d-flex align-items-end">
-                                    <button type="button" class="btn btn-primary w-100" id="filtrar-relatorio-btn">
-                                        <i class="bi bi-filter"></i> Filtrar
-                                    </button>
-                                </div>
+            </div>
+        </div>
+
+        <!-- Movimentações -->
+        <div id="movimentacoes-content" class="content-section hidden">
+            <h2 class="mb-4">Movimentações Financeiras</h2>
+
+            <div class="card">
+                <div class="card-header">Nova Movimentação</div>
+                <div class="card-body">
+                    <form id="movimentacao-form">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="movimentacao-tipo" class="form-label">Tipo</label>
+                                <select class="form-select" id="movimentacao-tipo" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="ENTRADA">Entrada</option>
+                                    <option value="SAIDA">Saída</option>
+                                </select>
                             </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <div class="card mt-4">
-                    <div class="card-header">Relatório de Movimentações</div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Data/Hora</th>
-                                        <th>Tipo</th>
-                                        <th>Valor</th>
-                                        <th>Cliente</th>
-                                        <th>Produto</th>
-                                        <th>Descrição</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="relatorio-movimentacoes">
+                            <div class="col-md-3 mb-3">
+                                <label for="movimentacao-valor" class="form-label">Valor (R$)</label>
+                                <input type="number" step="0.01" class="form-control" id="movimentacao-valor" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="movimentacao-cliente" class="form-label">Cliente</label>
+                                <select class="form-select" id="movimentacao-cliente">
+                                    <option value="">Selecione um cliente (opcional)</option>
                                     <!-- Preenchido via JavaScript -->
-                                </tbody>
-                            </table>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="movimentacao-produto" class="form-label">Produto</label>
+                                <select class="form-select" id="movimentacao-produto">
+                                    <option value="">Selecione um produto (opcional)</option>
+                                    <!-- Preenchido via JavaScript -->
+                                </select>
+                            </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="movimentacao-descricao" class="form-label">Descrição</label>
+                                <textarea class="form-control" id="movimentacao-descricao" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrar Movimentação</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Histórico de Movimentações</span>
+                    <button class="btn btn-sm btn-success" id="export-movimentacoes-btn">
+                        <i class="bi bi-download"></i> Exportar
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Cliente</th>
+                                <th>Produto</th>
+                                <th>Descrição</th>
+                            </tr>
+                            </thead>
+                            <tbody id="movimentacoes-list">
+                            <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatórios -->
+        <div id="relatorios-content" class="content-section hidden">
+            <h2 class="mb-4">Relatórios</h2>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Relatório de Clientes</h5>
+                            <p class="card-text">Lista completa de clientes cadastrados</p>
+                            <button class="btn btn-success" id="export-clientes-btn">
+                                <i class="bi bi-download"></i> Exportar CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Relatório de Produtos</h5>
+                            <p class="card-text">Lista completa de produtos cadastrados</p>
+                            <button class="btn btn-success" id="export-produtos-btn">
+                                <i class="bi bi-download"></i> Exportar CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Relatório Financeiro</h5>
+                            <p class="card-text">Todas as movimentações financeiras</p>
+                            <button class="btn btn-success" id="export-financeiro-btn">
+                                <i class="bi bi-download"></i> Exportar CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Filtros para Relatório de Movimentações</div>
+                <div class="card-body">
+                    <form id="relatorio-form">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="data-inicio" class="form-label">Data Início</label>
+                                <input type="date" class="form-control" id="data-inicio">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="data-fim" class="form-label">Data Fim</label>
+                                <input type="date" class="form-control" id="data-fim">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="tipo-relatorio" class="form-label">Tipo</label>
+                                <select class="form-select" id="tipo-relatorio">
+                                    <option value="">Todos</option>
+                                    <option value="ENTRADA">Entrada</option>
+                                    <option value="SAIDA">Saída</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary w-100" id="filtrar-relatorio-btn">
+                                    <i class="bi bi-filter"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Botão para exportar relatório filtrado -->
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-success w-100" id="export-relatorio-filtrado-btn">
+                                    <i class="bi bi-download"></i> Exportar Relatório Filtrado para CSV
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">Relatório de Movimentações</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Cliente</th>
+                                <th>Produto</th>
+                                <th>Descrição</th>
+                            </tr>
+                            </thead>
+                            <tbody id="relatorio-movimentacoes">
+                            <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/app.js"></script>
-
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
