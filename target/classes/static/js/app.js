@@ -1,19 +1,13 @@
 console.log("app.js carregado com sucesso!");
 
-// Dados de exemplo para demonstração
-const usuarios = [
-    { username: 'admin@contacerta.com', password: 'senha123', role: 'admin', nome: 'Administrador' },
-    { username: 'atendente@contacerta.com', password: 'senha123', role: 'atendente', nome: 'Atendente' }
-];
-
-// Dados de exemplo
-let clientes = [];
-let produtos = [];
-let movimentacoes = [];
-
 // Estado da aplicação
 let currentUser = null;
 const API_BASE_URL = 'http://localhost:8080/api';
+
+// Dados da aplicação
+let clientes = [];
+let produtos = [];
+let movimentacoes = [];
 
 // Elementos da DOM
 const loginPage = document.getElementById('login-page');
@@ -23,16 +17,22 @@ const logoutBtn = document.getElementById('logout-btn');
 const currentUserElement = document.getElementById('current-user');
 const userRoleElement = document.getElementById('user-role');
 const adminOnlyElements = document.querySelectorAll('.admin-only');
-const atendenteRestrictedElements = document.querySelectorAll('.atendente-restricted');
 
 // Função para chamadas API
 async function apiCall(endpoint, options = {}) {
     try {
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers
+        };
+
+        // Adicionar token de autenticação se disponível
+        if (currentUser && currentUser.token) {
+            headers['Authorization'] = `Bearer ${currentUser.token}`;
+        }
+
         const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            },
+            headers,
             ...options
         };
 
@@ -41,6 +41,12 @@ async function apiCall(endpoint, options = {}) {
         }
 
         const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+        if (response.status === 401) {
+            // Token inválido ou expirado
+            handleLogout();
+            throw new Error('Sessão expirada. Faça login novamente.');
+        }
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -113,35 +119,50 @@ function setupEventListeners() {
     document.getElementById('export-clientes-btn')?.addEventListener('click', exportClientes);
     document.getElementById('export-produtos-btn')?.addEventListener('click', exportProdutos);
     document.getElementById('export-financeiro-btn')?.addEventListener('click', exportFinanceiro);
+    document.getElementById('export-movimentacoes-btn')?.addEventListener('click', exportRelatorioMovimentacoes);
+    document.getElementById('filtrar-relatorio-btn')?.addEventListener('click', filtrarRelatorio);
+
+    // Novo botão para exportar relatório filtrado
+    document.getElementById('export-relatorio-filtrado-btn')?.addEventListener('click', exportRelatorioMovimentacoes);
 }
 
 // Handlers de eventos
 async function handleLogin(e) {
     e.preventDefault();
 
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const email = document.getElementById('username').value;
+    const senha = document.getElementById('password').value;
     const userType = document.getElementById('user-type').value;
 
     try {
-        // Verificar credenciais locais (para demonstração)
-        const usuario = usuarios.find(u =>
-            u.username === username &&
-            u.password === password &&
-            u.role === userType
-        );
+        const loginData = {
+            email: email,
+            senha: senha,
+            tipo: userType.toUpperCase()
+        };
 
-        if (usuario) {
-            currentUser = usuario;
+        const response = await apiCall('/auth/login', {
+            method: 'POST',
+            body: loginData
+        });
+
+        if (response.token) {
+            currentUser = {
+                nome: response.nome,
+                email: response.email,
+                role: response.tipo.toLowerCase(),
+                token: response.token
+            };
+
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             showApp();
             await loadInitialData();
             showNotification('Login realizado com sucesso!', 'success');
         } else {
-            showNotification('Credenciais inválidas. Tente novamente.', 'error');
+            showNotification('Erro no login. Tente novamente.', 'error');
         }
     } catch (error) {
-        showNotification('Erro ao fazer login. Tente novamente.', 'error');
+        showNotification('Erro ao fazer login: ' + error.message, 'error');
         console.error('Erro no login:', error);
     }
 }
@@ -178,6 +199,7 @@ async function handleClienteSubmit(e) {
         e.target.reset();
         renderClientes();
         populateSelects();
+        await updateDashboard();
         showNotification('Cliente cadastrado com sucesso!', 'success');
     } catch (error) {
         showNotification('Erro ao cadastrar cliente: ' + error.message, 'error');
@@ -209,6 +231,7 @@ async function handleProdutoSubmit(e) {
         e.target.reset();
         renderProdutos();
         populateSelects();
+        await updateDashboard();
         showNotification('Produto cadastrado com sucesso!', 'success');
     } catch (error) {
         showNotification('Erro ao cadastrar produto: ' + error.message, 'error');
@@ -480,33 +503,38 @@ function renderRelatoriosSection() {
     } else {
         // Conteúdo normal para admin
         relatoriosContent.innerHTML = `
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-funnel"></i> Filtros do Relatório
-                    </h5>
+            <h2 class="mb-4">Relatórios</h2>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Relatório de Clientes</h5>
+                            <p class="card-text">Lista completa de clientes cadastrados</p>
+                            <button class="btn btn-success" id="export-clientes-btn">
+                                <i class="bi bi-download"></i> Exportar CSV
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <label for="data-inicio" class="form-label">Data Início</label>
-                            <input type="date" class="form-control" id="data-inicio">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Relatório de Produtos</h5>
+                            <p class="card-text">Lista completa de produtos cadastrados</p>
+                            <button class="btn btn-success" id="export-produtos-btn">
+                                <i class="bi bi-download"></i> Exportar CSV
+                            </button>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="data-fim" class="form-label">Data Fim</label>
-                            <input type="date" class="form-control" id="data-fim">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="tipo-relatorio" class="form-label">Tipo</label>
-                            <select class="form-select" id="tipo-relatorio">
-                                <option value="">Todos</option>
-                                <option value="ENTRADA">Entrada</option>
-                                <option value="SAIDA">Saída</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 mb-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary w-100" onclick="filtrarRelatorio()">
-                                <i class="bi bi-funnel"></i> Filtrar
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Relatório Financeiro</h5>
+                            <p class="card-text">Todas as movimentações financeiras</p>
+                            <button class="btn btn-success" id="export-financeiro-btn">
+                                <i class="bi bi-download"></i> Exportar CSV
                             </button>
                         </div>
                     </div>
@@ -514,17 +542,49 @@ function renderRelatoriosSection() {
             </div>
 
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-list-check"></i> Relatório de Movimentações
-                    </h5>
-                    <button type="button" class="btn btn-success" onclick="exportRelatorioMovimentacoes()">
-                        <i class="bi bi-download"></i> Exportar CSV
-                    </button>
+                <div class="card-header">Filtros para Relatório de Movimentações</div>
+                <div class="card-body">
+                    <form id="relatorio-form">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="data-inicio" class="form-label">Data Início</label>
+                                <input type="date" class="form-control" id="data-inicio">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="data-fim" class="form-label">Data Fim</label>
+                                <input type="date" class="form-control" id="data-fim">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="tipo-relatorio" class="form-label">Tipo</label>
+                                <select class="form-select" id="tipo-relatorio">
+                                    <option value="">Todos</option>
+                                    <option value="ENTRADA">Entrada</option>
+                                    <option value="SAIDA">Saída</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary w-100" id="filtrar-relatorio-btn">
+                                    <i class="bi bi-filter"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Botão para exportar relatório filtrado -->
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-success w-100" id="export-relatorio-filtrado-btn">
+                                    <i class="bi bi-download"></i> Exportar Relatório CSV
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">Relatório de Movimentações</div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>Data/Hora</th>
@@ -536,13 +596,20 @@ function renderRelatoriosSection() {
                                 </tr>
                             </thead>
                             <tbody id="relatorio-movimentacoes">
-                                <!-- Dados serão carregados aqui -->
+                                <!-- Preenchido via JavaScript -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         `;
+
+        // Re-configurar event listeners
+        document.getElementById('export-clientes-btn')?.addEventListener('click', exportClientes);
+        document.getElementById('export-produtos-btn')?.addEventListener('click', exportProdutos);
+        document.getElementById('export-financeiro-btn')?.addEventListener('click', exportFinanceiro);
+        document.getElementById('filtrar-relatorio-btn')?.addEventListener('click', filtrarRelatorio);
+        document.getElementById('export-relatorio-filtrado-btn')?.addEventListener('click', exportRelatorioMovimentacoes);
 
         // Renderizar dados
         renderMovimentacoes();
@@ -587,7 +654,7 @@ function showApp() {
 
 function applyUserPermissions() {
     // Admin: ver tudo
-    // Atendente: apenas consultas e relatórios
+    // Atendente: apenas consultas
 
     adminOnlyElements.forEach(el => {
         if (currentUser.role === 'admin') {
@@ -597,16 +664,24 @@ function applyUserPermissions() {
         }
     });
 
-    // Para atendente, remover a opção de movimentações e relatórios do sidebar
-    const movimentacaoLink = document.querySelector('a[href="#movimentacoes"]');
-    const relatoriosLink = document.querySelector('a[href="#relatorios"]');
+    // Ocultar/mostrar saldo no dashboard
+    const saldoElement = document.getElementById('saldo-atual');
+    if (saldoElement) {
+        if (currentUser.role === 'admin') {
+            saldoElement.classList.remove('hidden');
+        } else {
+            saldoElement.classList.add('hidden');
+        }
+    }
 
-    if (currentUser.role === 'atendente') {
-        if (movimentacaoLink) movimentacaoLink.parentElement.classList.add('hidden');
-        if (relatoriosLink) relatoriosLink.parentElement.classList.add('hidden');
-    } else {
-        if (movimentacaoLink) movimentacaoLink.parentElement.classList.remove('hidden');
-        if (relatoriosLink) relatoriosLink.parentElement.classList.remove('hidden');
+    // Ocultar botão "Ver Todas" no dashboard para atendentes
+    const verTodasBtn = document.querySelector('a[href="#movimentacoes"]');
+    if (verTodasBtn) {
+        if (currentUser.role === 'admin') {
+            verTodasBtn.classList.remove('hidden');
+        } else {
+            verTodasBtn.classList.add('hidden');
+        }
     }
 }
 
@@ -640,21 +715,13 @@ function showSection(sectionId) {
         updateDashboard();
     } else if (sectionId === 'clientes') {
         renderClientes();
-        // Se for atendente, ocultar formulário de cadastro
-        if (currentUser.role === 'atendente') {
-            document.getElementById('cliente-form')?.closest('.card')?.classList.add('hidden');
-        }
     } else if (sectionId === 'produtos') {
         renderProdutos();
-        // Se for atendente, ocultar formulário de cadastro
-        if (currentUser.role === 'atendente') {
-            document.getElementById('produto-form')?.closest('.card')?.classList.add('hidden');
-        }
     } else if (sectionId === 'movimentacoes') {
         renderMovimentacoes();
-        renderMovimentacaoForm(); // Renderizar formulário com base na permissão
+        renderMovimentacaoForm();
     } else if (sectionId === 'relatorios') {
-        renderRelatoriosSection(); // Renderizar seção de relatórios com base na permissão
+        renderRelatoriosSection();
     }
 }
 
@@ -761,12 +828,14 @@ async function updateDashboard() {
 
         document.getElementById('movimentacoes-hoje').textContent = movHoje;
 
-        // Calcular saldo através da API
-        const saldo = await apiCall('/movimentacoes/saldo');
+        // Calcular saldo apenas para administradores
         const saldoElement = document.getElementById('saldo-atual');
 
-        saldoElement.textContent = `Saldo: R$ ${saldo?.toFixed(2) || '0.00'}`;
-        saldoElement.className = `fs-4 fw-bold ${(saldo || 0) >= 0 ? 'saldo-positivo' : 'saldo-negativo'}`;
+        if (currentUser.role === 'admin') {
+            const saldo = await apiCall('/movimentacoes/saldo');
+            saldoElement.textContent = `Saldo: R$ ${saldo?.toFixed(2) || '0.00'}`;
+            saldoElement.className = `fs-4 fw-bold ${(saldo || 0) >= 0 ? 'text-success' : 'text-danger'}`;
+        }
 
         // Atualizar últimas movimentações
         renderMovimentacoes();
@@ -806,6 +875,51 @@ async function deleteProduto(id) {
     }
 }
 
+// Nova função para obter movimentações filtradas (reutilizável)
+function getMovimentacoesFiltradas() {
+    const dataInicio = document.getElementById('data-inicio')?.value;
+    const dataFim = document.getElementById('data-fim')?.value;
+    const tipo = document.getElementById('tipo-relatorio')?.value;
+
+    let movimentacoesFiltradas = [...movimentacoes];
+
+    // Aplicar os mesmos filtros que estão no relatório
+    if (dataInicio || dataFim || tipo) {
+        movimentacoesFiltradas = movimentacoesFiltradas.filter(mov => {
+            let passaFiltro = true;
+
+            // Filtrar por data de início
+            if (dataInicio) {
+                const inicio = new Date(dataInicio);
+                const dataMov = new Date(mov.dataMovimentacao);
+                // Resetar horas para comparar apenas datas
+                inicio.setHours(0, 0, 0, 0);
+                const dataMovReset = new Date(dataMov);
+                dataMovReset.setHours(0, 0, 0, 0);
+                passaFiltro = passaFiltro && dataMovReset >= inicio;
+            }
+
+            // Filtrar por data de fim
+            if (dataFim) {
+                const fim = new Date(dataFim);
+                const dataMov = new Date(mov.dataMovimentacao);
+                // Resetar horas e adicionar um dia para incluir a data final
+                fim.setHours(23, 59, 59, 999);
+                passaFiltro = passaFiltro && dataMov <= fim;
+            }
+
+            // Filtrar por tipo
+            if (tipo) {
+                passaFiltro = passaFiltro && mov.tipo === tipo;
+            }
+
+            return passaFiltro;
+        });
+    }
+
+    return movimentacoesFiltradas;
+}
+
 function filtrarRelatorio() {
     // Verificar se é atendente (não deveria conseguir acessar, mas por segurança)
     if (currentUser.role === 'atendente') {
@@ -813,33 +927,7 @@ function filtrarRelatorio() {
         return;
     }
 
-    const dataInicio = document.getElementById('data-inicio')?.value;
-    const dataFim = document.getElementById('data-fim')?.value;
-    const tipo = document.getElementById('tipo-relatorio')?.value;
-
-    let movimentacoesFiltradas = [...movimentacoes];
-
-    // Filtrar por data
-    if (dataInicio) {
-        const inicio = new Date(dataInicio);
-        movimentacoesFiltradas = movimentacoesFiltradas.filter(m => {
-            const dataMov = new Date(m.dataMovimentacao);
-            return dataMov >= inicio;
-        });
-    }
-
-    if (dataFim) {
-        const fim = new Date(dataFim);
-        movimentacoesFiltradas = movimentacoesFiltradas.filter(m => {
-            const dataMov = new Date(m.dataMovimentacao);
-            return dataMov <= fim;
-        });
-    }
-
-    // Filtrar por tipo
-    if (tipo) {
-        movimentacoesFiltradas = movimentacoesFiltradas.filter(m => m.tipo === tipo);
-    }
+    const movimentacoesFiltradas = getMovimentacoesFiltradas();
 
     // Renderizar resultados
     const relatorioMovimentacoes = document.getElementById('relatorio-movimentacoes');
@@ -880,6 +968,9 @@ function filtrarRelatorio() {
             </tr>
         `;
     });
+
+    // Mostrar contagem de resultados
+    showNotification(`Filtro aplicado: ${movimentacoesFiltradas.length} movimentações encontradas.`, 'info');
 }
 
 // Funções de exportação
@@ -995,7 +1086,6 @@ function exportFinanceiro() {
     showNotification('Exportação financeira concluída!', 'success');
 }
 
-// NOVA FUNÇÃO ESPECÍFICA PARA EXPORTAR RELATÓRIO COM FILTROS
 function exportRelatorioMovimentacoes() {
     // Verificar permissão
     if (currentUser.role === 'atendente') {
@@ -1003,49 +1093,10 @@ function exportRelatorioMovimentacoes() {
         return;
     }
 
-    // Obter dados filtrados ou todos os dados
-    let dadosParaExportar = [...movimentacoes];
+    // Obter dados filtrados do relatório
+    let dadosParaExportar = getMovimentacoesFiltradas();
 
-    // Aplicar filtros se existirem
-    const dataInicio = document.getElementById('data-inicio')?.value;
-    const dataFim = document.getElementById('data-fim')?.value;
-    const tipo = document.getElementById('tipo-relatorio')?.value;
-
-    console.log('Filtros aplicados:', { dataInicio, dataFim, tipo });
-
-    if (dataInicio || dataFim || tipo) {
-        dadosParaExportar = dadosParaExportar.filter(mov => {
-            let passaFiltro = true;
-
-            // Filtrar por data
-            if (dataInicio) {
-                const inicio = new Date(dataInicio);
-                const dataMov = new Date(mov.dataMovimentacao);
-                // Resetar horas para comparar apenas datas
-                inicio.setHours(0, 0, 0, 0);
-                const dataMovReset = new Date(dataMov);
-                dataMovReset.setHours(0, 0, 0, 0);
-                passaFiltro = passaFiltro && dataMovReset >= inicio;
-            }
-
-            if (dataFim) {
-                const fim = new Date(dataFim);
-                const dataMov = new Date(mov.dataMovimentacao);
-                // Resetar horas e adicionar um dia para incluir a data final
-                fim.setHours(23, 59, 59, 999);
-                passaFiltro = passaFiltro && dataMov <= fim;
-            }
-
-            // Filtrar por tipo
-            if (tipo) {
-                passaFiltro = passaFiltro && mov.tipo === tipo;
-            }
-
-            return passaFiltro;
-        });
-    }
-
-    console.log('Dados para exportar:', dadosParaExportar.length);
+    console.log('Dados filtrados para exportar:', dadosParaExportar.length);
 
     // Ordenar por data (mais recente primeiro)
     dadosParaExportar.sort((a, b) =>
@@ -1081,17 +1132,24 @@ function exportRelatorioMovimentacoes() {
 
     // Gerar nome do arquivo com data e filtros
     let filename = 'relatorio_movimentacoes';
-    if (dataInicio || dataFim || tipo) {
-        const filtros = [];
-        if (dataInicio) filtros.push(`de_${dataInicio}`);
-        if (dataFim) filtros.push(`ate_${dataFim}`);
-        if (tipo) filtros.push(tipo.toLowerCase());
 
-        if (filtros.length > 0) {
-            filename += '_' + filtros.join('_');
-        }
+    // Adicionar informações dos filtros ao nome do arquivo
+    const dataInicio = document.getElementById('data-inicio')?.value;
+    const dataFim = document.getElementById('data-fim')?.value;
+    const tipo = document.getElementById('tipo-relatorio')?.value;
+
+    const filtros = [];
+    if (dataInicio) filtros.push(`de_${dataInicio}`);
+    if (dataFim) filtros.push(`ate_${dataFim}`);
+    if (tipo) filtros.push(tipo.toLowerCase());
+
+    if (filtros.length > 0) {
+        filename += '_' + filtros.join('_');
     }
-    filename += '.csv';
+
+    // Adicionar data atual ao nome do arquivo
+    const dataAtual = new Date().toISOString().split('T')[0];
+    filename += `_${dataAtual}.csv`;
 
     // Exportar
     exportToCSV([headers, ...data], filename);
@@ -1138,3 +1196,5 @@ window.exportProdutos = exportProdutos;
 window.exportFinanceiro = exportFinanceiro;
 window.filtrarRelatorio = filtrarRelatorio;
 window.exportRelatorioMovimentacoes = exportRelatorioMovimentacoes;
+window.searchClientes = searchClientes;
+window.searchProdutos = searchProdutos;

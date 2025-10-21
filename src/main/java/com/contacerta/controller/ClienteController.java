@@ -22,16 +22,25 @@ public class ClienteController {
 
     @GetMapping
     @Operation(summary = "Listar todos os clientes")
-    public List<ClienteDTO> listarTodos() {
-        return clienteService.listarTodos();
+    public ResponseEntity<List<ClienteDTO>> listarTodos() {
+        try {
+            List<ClienteDTO> clientes = clienteService.listarTodos();
+            return ResponseEntity.ok(clientes);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar cliente por ID")
     public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable Long id) {
-        Optional<ClienteDTO> cliente = clienteService.buscarPorId(id);
-        return cliente.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            Optional<ClienteDTO> cliente = clienteService.buscarPorId(id);
+            return cliente.map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @PostMapping
@@ -42,6 +51,8 @@ public class ClienteController {
             return ResponseEntity.ok(clienteSalvo);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro interno ao criar cliente");
         }
     }
 
@@ -54,6 +65,8 @@ public class ClienteController {
                     .orElse(ResponseEntity.notFound().build());
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro interno ao atualizar cliente");
         }
     }
 
@@ -65,6 +78,33 @@ public class ClienteController {
             return deletado ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro interno ao excluir cliente");
+        }
+    }
+
+    @GetMapping("/email/{email}")
+    @Operation(summary = "Verificar se email existe")
+    public ResponseEntity<Boolean> verificarEmail(@PathVariable String email) {
+        try {
+            boolean existe = clienteService.verificarEmailExistente(email);
+            return ResponseEntity.ok(existe);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Pesquisar clientes por nome, email ou telefone")
+    public ResponseEntity<List<ClienteDTO>> pesquisarClientes(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String telefone) {
+        try {
+            List<ClienteDTO> clientes = clienteService.pesquisarClientes(nome, email, telefone);
+            return ResponseEntity.ok(clientes);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
