@@ -2,7 +2,6 @@ package com.contacerta.service;
 
 import com.contacerta.dto.LoginRequest;
 import com.contacerta.dto.LoginResponse;
-import com.contacerta.entity.TipoUsuario;
 import com.contacerta.entity.Usuario;
 import com.contacerta.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +37,8 @@ public class AuthService {
             throw new RuntimeException("Senha incorreta");
         }
 
-        // Verificar tipo de usuário
-        if (usuario.getTipo() != loginRequest.getTipo()) {
-            throw new RuntimeException("Tipo de usuário incorreto para este login");
-        }
+        // REMOVIDO: Verificação de tipo de usuário
+        // O sistema agora detecta automaticamente pelo email
 
         // Gerar token JWT
         String token = jwtService.generateToken(usuario);
@@ -56,7 +53,7 @@ public class AuthService {
             admin.setNome("Administrador");
             admin.setEmail("admin@contacerta.com");
             admin.setSenha(passwordEncoder.encode("admin123"));
-            admin.setTipo(TipoUsuario.ADMIN);
+            admin.setTipo(com.contacerta.entity.TipoUsuario.ADMIN);
             usuarioRepository.save(admin);
             System.out.println("Usuário admin criado: admin@contacerta.com / admin123");
         }
@@ -67,7 +64,7 @@ public class AuthService {
             atendente.setNome("Atendente");
             atendente.setEmail("atendente@contacerta.com");
             atendente.setSenha(passwordEncoder.encode("atendente123"));
-            atendente.setTipo(TipoUsuario.ATENDENTE);
+            atendente.setTipo(com.contacerta.entity.TipoUsuario.ATENDENTE);
             usuarioRepository.save(atendente);
             System.out.println("Usuário atendente criado: atendente@contacerta.com / atendente123");
         }

@@ -30,9 +30,23 @@ public class SecurityConfig {
                         // Arquivos estáticos - permitir sem autenticação
                         .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/img/**", "/favicon.ico").permitAll()
 
-                        // Endpoints públicos
+                        // Swagger - permitir sem autenticação
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs",
+                                "/api-docs",
+                                "/api-docs/**",
+                                "/swagger-resources",
+                                "/swagger-resources/**",
+                                "/configuration/ui",
+                                "/configuration/security",
+                                "/webjars/**"
+                        ).permitAll()
+
+                        // Endpoints públicos de autenticação
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         // Endpoints de consulta - permitidos para todos os usuários autenticados
                         .requestMatchers(
@@ -75,7 +89,10 @@ public class SecurityConfig {
                 "/js/**",
                 "/img/**",
                 "/favicon.ico",
-                "/index.html"
+                "/index.html",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/webjars/**"
         );
     }
 

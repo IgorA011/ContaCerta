@@ -1,19 +1,15 @@
 package com.contacerta.dto;
 
-import com.contacerta.entity.TipoUsuario;
-
 public class LoginRequest {
     private String email;
     private String senha;
-    private TipoUsuario tipo;
 
     // Construtores
     public LoginRequest() {}
 
-    public LoginRequest(String email, String senha, TipoUsuario tipo) {
+    public LoginRequest(String email, String senha) {
         this.email = email;
         this.senha = senha;
-        this.tipo = tipo;
     }
 
     // Getters e Setters
@@ -22,7 +18,4 @@ public class LoginRequest {
 
     public String getSenha() { return senha; }
     public void setSenha(String senha) { this.senha = senha; }
-
-    public TipoUsuario getTipo() { return tipo; }
-    public void setTipo(TipoUsuario tipo) { this.tipo = tipo; }
 }
