@@ -2,8 +2,8 @@ console.log("app.js carregado com sucesso!");
 
 // Dados de exemplo para demonstração
 const usuarios = [
-    { username: 'admin', password: 'senha123', role: 'admin', nome: 'Administrador' },
-    { username: 'atendente', password: 'senha123', role: 'atendente', nome: 'Atendente' }
+    { username: 'admin@contacerta.com', password: 'senha123', role: 'admin', nome: 'Administrador' },
+    { username: 'atendente@contacerta.com', password: 'senha123', role: 'atendente', nome: 'Atendente' }
 ];
 
 // Dados de exemplo
