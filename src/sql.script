@@ -1,4 +1,37 @@
+-- Script completo para criar e popular o banco
+
+CREATE DATABASE IF NOT EXISTS financeiro_db;
+
 USE financeiro_db;
+
+-- Tabela de Clientes
+CREATE TABLE IF NOT EXISTS clientes (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    telefone VARCHAR(20) NOT NULL
+);
+
+-- Tabela de Produtos
+CREATE TABLE IF NOT EXISTS produtos (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    quantidade_estoque INT NOT NULL
+);
+
+-- Tabela de Movimentações
+CREATE TABLE IF NOT EXISTS movimentacoes (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    tipo ENUM('ENTRADA', 'SAIDA') NOT NULL,
+    valor DECIMAL(10,2) NOT NULL,
+    descricao TEXT,
+    cliente_id BIGINT,
+    produto_id BIGINT,
+    data_movimentacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL,
+    FOREIGN KEY (produto_id) REFERENCES produtos(id) ON DELETE SET NULL
+);
 
 -- Inserir Clientes
 INSERT INTO clientes (nome, email, telefone) VALUES
@@ -35,6 +68,14 @@ INSERT INTO movimentacoes (tipo, valor, descricao, cliente_id, produto_id, data_
 ('ENTRADA', 199.99, 'Venda de Teclado Mecânico', 4, 3, '2024-01-21 09:20:00'),
 ('SAIDA', 75.00, 'Despesa com manutenção', NULL, NULL, '2024-01-21 16:45:00'),
 ('ENTRADA', 89.90, 'Venda de Mouse Logitech', 5, 2, '2024-01-22 11:10:00');
+
+-- Consulta para verificar o saldo atual
+SELECT
+    (SELECT COALESCE(SUM(valor), 0) FROM movimentacoes WHERE tipo = 'ENTRADA') AS total_entradas,
+    (SELECT COALESCE(SUM(valor), 0) FROM movimentacoes WHERE tipo = 'SAIDA') AS total_saidas,
+    (SELECT COALESCE(SUM(valor), 0) FROM movimentacoes WHERE tipo = 'ENTRADA') -
+    (SELECT COALESCE(SUM(valor), 0) FROM movimentacoes WHERE tipo = 'SAIDA') AS saldo_atual;
+
 
 
 DADOS FICTÍCIOS PARA APRESENTAÇÃO - IGOR ALVES
