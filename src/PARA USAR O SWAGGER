@@ -1,0 +1,180 @@
+🚀 Passo a Passo Completo para Usar o Swagger
+📋 Pré-requisitos
+Aplicação rodando em http://localhost:8080
+
+Banco de dados MySQL configurado
+
+Usuários padrão criados
+
+🔑 PASSO 1: ACESSAR O SWAGGER
+URL: http://localhost:8080/swagger-ui/index.html
+
+Você verá esta interface:
+
+text
+📚 Swagger UI
+├── 🔐 auth-controller
+├── 👥 cliente-controller
+├── 💰 movimentacao-controller
+├── 📦 produto-controller
+└── 🧪 test-controller
+
+🔐 PASSO 2: OBTER TOKEN DE ACESSO
+2.1 Fazer Login
+Expanda o endpoint: POST /api/auth/login
+
+Clique no botão "Try it out"
+
+Cole este JSON no campo "Request body":
+
+Para Administrador:
+
+json
+{
+  "email": "admin@contacerta.com",
+  "senha": "admin123"
+}
+Para Atendente:
+
+json
+{
+  "email": "atendente@contacerta.com",
+  "senha": "atendente123"
+}
+Clique em "Execute"
+
+2.2 Copiar o Token
+Na resposta, você verá:
+
+json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "nome": "Administrador",
+  "tipo": "ADMIN",
+  "email": "admin@contacerta.com"
+}
+
+📝 COPIE o token completo (desde eyJ... até o final)
+
+🔒 PASSO 3: CONFIGURAR AUTORIZAÇÃO
+No topo da página, clique no botão "Authorize" 🔒
+
+No campo que aparecer, cole no formato:
+
+text
+Bearer seu-token-aqui
+Exemplo:
+
+text
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Clique em "Authorize"
+
+Feche a janela clicando em "Close"
+
+✅ Agora todas as requisições enviarão automaticamente o token!
+
+🧪 PASSO 4: TESTAR ENDPOINTS
+🎯 Para ADMINISTRADORES (admin@contacerta.com)
+4.1 Gerenciar Clientes
+Listar: GET /api/clientes → Clique "Execute"
+
+Criar: POST /api/clientes → Use este JSON:
+
+json
+{
+  "nome": "João Silva",
+  "email": "joao@email.com",
+  "telefone": "(11) 99999-9999"
+}
+4.2 Gerenciar Produtos
+Listar: GET /api/produtos
+
+Criar: POST /api/produtos → Use:
+
+json
+{
+  "nome": "Notebook Dell",
+  "preco": 2500.00,
+  "quantidadeEstoque": 10
+}
+4.3 Fazer Movimentações
+Criar Entrada: POST /api/movimentacoes → Use:
+
+json
+{
+  "tipo": "ENTRADA",
+  "valor": 1000.00,
+  "descricao": "Venda de produto"
+}
+Criar Saída: POST /api/movimentacoes → Use:
+
+json
+{
+  "tipo": "SAIDA",
+  "valor": 500.00,
+  "descricao": "Compra de material"
+}
+4.4 Ver Saldo
+Consultar: GET /api/movimentacoes/saldo
+
+👥 Para ATENDENTES (atendente@contacerta.com)
+4.5 Apenas Consultas
+Listar Clientes: GET /api/clientes ✅
+
+Buscar Cliente: GET /api/clientes/{id} ✅
+
+Listar Produtos: GET /api/produtos ✅
+
+Ver Movimentações: GET /api/movimentacoes ✅
+
+❌ ATENDENTES NÃO PODEM: Criar, editar ou excluir registros!
+
+🔍 PASSO 5: USAR FILTROS E PESQUISAS
+5.1 Pesquisar Clientes
+GET /api/clientes/search?nome=joão → Busca por nome
+
+GET /api/clientes/search?email=joao → Busca por email
+
+GET /api/clientes/email/joao@email.com → Verificar email
+
+5.2 Verificar Saldo
+GET /api/movimentacoes/saldo → Mostra saldo atual
+
+📊 PASSO 6: TESTAR PERMISSÕES
+Como testar se está funcionando:
+Faça login como Atendente
+
+Tente criar um cliente → Deve dar 403 Forbidden
+
+Faça login como Admin
+
+Tente criar um cliente → Deve funcionar ✅
+
+🛠 PASSO 7: SOLUÇÃO DE PROBLEMAS
+❌ Erro 401 Unauthorized
+Token expirou ou inválido
+
+Solução: Faça login novamente e atualize o token
+
+❌ Erro 403 Forbidden
+Usuário não tem permissão
+
+Solução: Use conta de administrador
+
+❌ Erro 400 Bad Request
+JSON mal formatado ou campos faltando
+
+Solução: Verifique o formato do JSON
+
+❌ Token não está sendo enviado
+Solução: Clique em "Authorize" novamente e cole o token
+
+💡 DICAS EXTRAS
+📱 Interface do Swagger:
+"Execute" → Envia a requisição
+
+"Clear" → Limpa os campos
+
+"Copy" → Copia o curl da requisição
+
+Botão 🔒 → Endpoints que exigem autenticação
