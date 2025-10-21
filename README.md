@@ -16,8 +16,8 @@ Sistema completo de gestão financeira com controle de clientes, produtos e movi
 
 | Perfil | Usuário | Senha | Acesso |
 |--------|---------|-------|---------|
-| Administrador | `admin` | `senha123` | Completo |
-| Atendente | `atendente` | `senha123` | Consultas |
+| Administrador | `admin@contacerta.com` | `senha123` | Completo |
+| Atendente | `atendente@contacerta.com` | `senha123` | Consultas |
 
 ## ✨ Funcionalidades
 
