@@ -13,7 +13,7 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Sistema Financeiro - Conta Certa API")
+                        .title("Sistema Financeiro - Conta Certa")
                         .version("1.0")
                         .description("API para gerenciamento de clientes, produtos e movimentações financeiras"));
     }
