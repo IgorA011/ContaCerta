@@ -1,13 +1,13 @@
-// FinanceiroApplication.java
+// ContacertaApplication.java
 package com.contacerta;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FinanceiroApplication {
+public class ContacertaApplication {
     public static void main(String[] args) {
-        SpringApplication.run(FinanceiroApplication.class, args);
+        SpringApplication.run(ContacertaApplication.class, args);
     }
 }
 
